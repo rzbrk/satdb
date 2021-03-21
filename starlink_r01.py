@@ -30,21 +30,27 @@ def main(args):
     not_selected = True
     while (not_selected):
         print("")
-        print("Select launch event:")
+        print("Please select a launch event (choose by row number):")
         i = 1
         for d in dates:
             lid = d[0]
-            launch_date = d[1]
-            print("  ", i, lid, launch_date)
+            ldate = d[1].strftime("%Y-%m-%d")
+            print("  ", i, lid, "(" + ldate + ")")
             i += 1
 
         print("")
         l = input("Select: ")
-        l = int(l)
+        try:
+            l = int(l)
+        except:
+            # Choose a non-valid integer instead
+            l = 0
 
+        # Check if l is in the right range
         if (l >= 1 and l <= len(dates)):
             not_selected = False
 
+    print("")
     # Fetch all starlink and falcon 9 objects from selected launch. Exclude
     # the rideshare payloads other than starlink
     lid = dates[l - 1][0]
@@ -57,7 +63,7 @@ def main(args):
     for r in res:
         norad = r[0]
         name = r[1]
-        print("\t", norad, name)
+        print("  Retrieving data for", name, "(NORAD Cat ID: " + str(norad) + ") ...")
 
         # Retrieve data (epoch, semimajor axis) for object
         query = "select epoch, semimajor_axis from orbelem where norad_cat_id = %s"
@@ -85,7 +91,10 @@ def main(args):
         plt.title("Starlink Launch " + lid + " (" + ldate.strftime("%Y-%m-%d") + ")")
 
     # Save plot to file
-    plt.savefig("output/" + lid + ".png", format="png")
+    imgfile = "output/" + lid + ".png"
+    plt.savefig(imgfile, format="png")
+    print("")
+    print("Image saved to", imgfile)
 
     dbc.disconnect()
 
