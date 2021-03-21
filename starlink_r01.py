@@ -6,7 +6,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import re
 
-from satdb import Config, Dbase
+from satdb import Config, Dbase, tools
 
 # Earth radius [km]
 r_earth = 6378.0
@@ -78,6 +78,10 @@ def main(args):
             # Substract Earth radius from semimajor axis
             sma.append(d[1] - r_earth)
 
+        # Set outlier to nan
+        if (args.skip_outliers):
+            sma = tools.outliers(sma, report=True)
+
         # Starlinks: blue line color
         # Falcon 9 R/B or debris: red line color
         if (re.match("STARLINK-.*", name)):
@@ -102,5 +106,7 @@ if __name__ == "__main__":
     """ This is executed when run from the command line """
     parser = argparse.ArgumentParser()
     parser.add_argument("config", help="Config file")
+    parser.add_argument("--skip-outliers", action = "store_true",
+            help="Skip outliers")
     args = parser.parse_args()
     main(args)
