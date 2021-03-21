@@ -1,38 +1,30 @@
 #!/usr/bin/env python3
 
-import mysql.connector
+import argparse
 from getpass import getpass
 from datetime import datetime
 import matplotlib.pyplot as plt
 import re
-from satdb import config, dbase
+
+from satdb import Config, Dbase
 
 # Earth radius [km]
 r_earth = 6378.0
 
-def dbconn():
-    pwd = getpass("Enter password: ")
-    dbc = mysql.connector.connect(
-            host = "h2916865.stratoserver.net",
-            user = "orbdata",
-            database = "orbdata01",
-            password = pwd,
-            )
-
-    return dbc
-
-def main():
+def main(args):
     now = datetime.now().strftime("%Y-%m-%d")
 
+    # Read the config file
+    config = Config(args.config)
+
     # Connect to database
-    dbc = dbconn()
+    dbc = Dbase(config)
+    dbc.connect()
 
     # Return array with year and launch no (YYYY-NNN) for all launches with
     # starlink satellites
-    c = dbc.cursor()
     query = "select distinct(substr(id, 1, 8)), launch_date from object_metadata where id is not null and name like 'STARLINK%' and launch_date <> '0000-00-00'"
-    c.execute(query)
-    dates = c.fetchall()
+    dates = dbc.fetchall(query)
 
     # Ask the user to select one launch event
     not_selected = True
@@ -58,10 +50,8 @@ def main():
     lid = dates[l - 1][0]
     ldate = dates[l - 1][1]
 
-    c = dbc.cursor()
     query = "select norad_cat_id, name from object_metadata where id like %s and (name like 'STARLINK%' or name like 'FALCON 9%')"
-    c.execute(query, (lid+"%",))
-    res = c.fetchall()
+    res = dbc.fetchall(query, (lid + "%",))
 
     # Loop over all objects
     for r in res:
@@ -70,10 +60,8 @@ def main():
         print("\t", norad, name)
 
         # Retrieve data (epoch, semimajor axis) for object
-        c = dbc.cursor()
         query = "select epoch, semimajor_axis from orbelem where norad_cat_id = %s"
-        c.execute(query, (norad,))
-        data = c.fetchall()
+        data = dbc.fetchall(query, (norad,))
         # Create empty arrays
         t = []
         sma = []
@@ -97,10 +85,13 @@ def main():
         plt.title("Starlink Launch " + lid + " (" + ldate.strftime("%Y-%m-%d") + ")")
 
     # Save plot to file
-    plt.savefig(lid+".png", format="png")
+    plt.savefig("output/" + lid + ".png", format="png")
 
-    dbc.close()
+    dbc.disconnect()
 
 if __name__ == "__main__":
     """ This is executed when run from the command line """
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("config", help="Config file")
+    args = parser.parse_args()
+    main(args)
