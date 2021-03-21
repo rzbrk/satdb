@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-from getpass import getpass
 from datetime import datetime
 import matplotlib.pyplot as plt
 import re
