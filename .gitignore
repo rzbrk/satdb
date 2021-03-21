@@ -1,0 +1,3 @@
+dbase.conf
+output/*.*
+__pycache__/
