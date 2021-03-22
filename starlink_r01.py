@@ -79,7 +79,7 @@ def main(args):
 
         # Set outlier to nan
         if (args.skip_outliers):
-            sma = tools.outliers(sma, report=True)
+            sma = tools.movmedian(sma, 2)
 
         # Starlinks: blue line color
         # Falcon 9 R/B or debris: red line color
