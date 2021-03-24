@@ -77,9 +77,9 @@ def main(args):
             # Substract Earth radius from semimajor axis
             sma.append(d[1] - r_earth)
 
-        # Set outlier to nan
-        if (args.skip_outliers):
-            sma = tools.movmedian(sma, 2)
+        # Apply moving median filter
+        if (args.movmedian):
+            sma = tools.movmedian(sma, args.movmedian)
 
         # Starlinks: blue line color
         # Falcon 9 R/B or debris: red line color
@@ -94,7 +94,10 @@ def main(args):
         plt.title("Starlink Launch " + lid + " (" + ldate.strftime("%Y-%m-%d") + ")")
 
     # Save plot to file
-    imgfile = "output/" + lid + ".png"
+    if (args.filename == ""):
+        imgfile = "output/" + lid + ".png"
+    else:
+        imgfile = args.filename
     plt.savefig(imgfile, format="png")
     print("")
     print("Image saved to", imgfile)
@@ -105,7 +108,15 @@ if __name__ == "__main__":
     """ This is executed when run from the command line """
     parser = argparse.ArgumentParser()
     parser.add_argument("config", help="Config file")
-    parser.add_argument("--skip-outliers", action = "store_true",
-            help="Skip outliers")
+    parser.add_argument("--movmedian",
+            type=int,
+            default=0,
+            help="Apply moving median filter. Specify box halfwidth.",
+            )
+    parser.add_argument("--filename",
+            type=str,
+            default="",
+            help="Specify filename for image",
+            )
     args = parser.parse_args()
     main(args)
