@@ -2,6 +2,9 @@
 
 import numpy as np
 
+# Earth radius in km
+re = 6378.
+
 def movmedian(data, boxhw):
     data_filtered = []
 

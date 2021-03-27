@@ -7,9 +7,6 @@ import re
 
 from satdb import Config, Dbase, tools
 
-# Earth radius [km]
-r_earth = 6378.0
-
 def main(args):
     now = datetime.now().strftime("%Y-%m-%d")
 
@@ -75,7 +72,7 @@ def main(args):
             dt = d[0] - ldate
             t.append(dt.days)
             # Substract Earth radius from semimajor axis
-            sma.append(d[1] - r_earth)
+            sma.append(d[1] - tools.re)
 
         # Apply moving median filter
         if (args.movmedian):
