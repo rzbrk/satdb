@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import yaml
+
 #------------------------------------------------------------------------------
 # Class for MySQL configuration
 class Config:
@@ -22,19 +24,24 @@ class Config:
         configlist = []
         try:
             with open(self.configfilename, "r") as configfile:
-                for line in configfile:
-                    if line[0] != '#' and line[0] != '\n':
-                        configlist.append(line.strip('\n').split('='))
+#                for line in configfile:
+#                    if line[0] != '#' and line[0] != '\n':
+#                        configlist.append(line.strip('\n').split('='))
+                configlist = yaml.load(configfile, Loader=yaml.FullLoader)["satdb"]
 
         except (IndexError, FileNotFoundError):
             print("Error opening file. Exiting.")
             exit()
 
         for configitem in configlist:
-            if configitem[0] in self.configdic.keys():
-                self.configdic[configitem[0]] = configitem[1].strip('"')
+#            if configitem[0] in self.configdic.keys():
+#                self.configdic[configitem[0]] = configitem[1].strip('"')
+#            else:
+#                print('Unknown configitemn: ', configitem[0])
+            if configitem in self.configdic.keys():
+                self.configdic[configitem] = configlist[configitem]
             else:
-                print('Unknown configitemn: ', configitem[0])
+                print('Unknown configitemn: ', configitem)
 
     def print(self):
         print('Current config:')

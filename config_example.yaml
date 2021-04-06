@@ -1,0 +1,6 @@
+satdb_read:
+    host: "localhost"
+    port: "3306"
+    database: "orbdata"
+    user: "dbuser"
+    password: "secret"
