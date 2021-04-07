@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import re as regexp
+import gzip
 
 # Earth radius in km
 re = 6378.
@@ -18,3 +20,13 @@ def movmedian(data, boxhw):
         #print(i, lb, ub, data[lb:ub+1], np.median(data[lb:ub+1]))
 
     return data_filtered
+
+# Open a file for reading. Unzip first, if gzipped
+def open_file(filename):
+    if regexp.match('.*.gz$', filename):
+        fh = gzip.open(filename, 'rt')
+    else:
+        fh = open(filename, '')
+
+    return fh
+
