@@ -81,6 +81,13 @@ if [ "${verbose}" == "true" ]; then
     tt_print "Downloaded cookie file: ${cookie}"
 fi
 
+# Get the time of validity from the cookie
+valid_unix=$(cat ${cookie} | grep "#HttpOnly_" | awk '{print $5}')
+valid=$(date -d @${valid_unix})
+if [ "${verbose}" == "true" ]; then
+    tt_print "Cookie valid until: ${valid}"
+fi
+
 # Output the name of the cookie file
 echo "Cookie: ${cookie}"
 
