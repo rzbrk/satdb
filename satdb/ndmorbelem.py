@@ -52,12 +52,27 @@ class NDMOrbelem:
         self.tle_line0 = NULL
         self.tle_line1 = NULL
         self.tle_line2 = NULL
-        self.semimajor_axis = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='SEMIMAJOR_AXIS']").text or NULL
-        self.period = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='PERIOD']").text or NULL
-        self.apoapsis = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='APOAPSIS']").text or NULL
-        self.periapsis = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='PERIAPSIS']").text or NULL
+        try:
+            self.semimajor_axis = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='SEMIMAJOR_AXIS']").text
+        except:
+            self.semimajor_axis = NULL
+        try:
+            self.period = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='PERIOD']").text
+        except:
+            self.perio = NULL
+        try:
+            self.apoapsis = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='APOAPSIS']").text
+        except:
+            self.apoapsis = NULL
+        try:
+            self.periapsis = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='PERIAPSIS']").text
+        except:
+            self.periapsis = NULL
         self.ingested = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
-        self.originator_comment = self.root.find(".//COMMENT").text or NULL
+        try:
+            self.originator_comment = self.root.find(".//COMMENT").text
+        except:
+            self.originator_comment = NULL
         self.date_created = self.root.find(".//CREATION_DATE").text or NULL
         self.originator = self.root.find(".//ORIGINATOR").text or NULL
 

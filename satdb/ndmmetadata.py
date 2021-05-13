@@ -37,13 +37,32 @@ class NDMMetadata:
         # description
         # image
         self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
-        self.obj_type = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='OBJECT_TYPE']").text
-        self.rcs_size = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='RCS_SIZE']").text or NULL
-        self.country_code = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='COUNTRY_CODE']").text or NULL
-        self.launch_date = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='LAUNCH_DATE']").text or NULL
-        self.site = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='SITE']").text or NULL
-        self.decay_date = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='DECAY_DATE']").text or NULL
-        self.classification_type = self.segment.find(".//tleParameters/CLASSIFICATION_TYPE").text
-        self.norad_cat_id = self.segment.find(".//tleParameters/NORAD_CAT_ID").text
-        self.name = self.segment.find(".//metadata/OBJECT_NAME").text
+        try:
+            self.obj_type = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='OBJECT_TYPE']").text
+        except:
+            self.obj_type = NULL
+        try:
+            self.rcs_size = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='RCS_SIZE']").text
+        except:
+            self.rcs_size = NULL
+        try:
+            self.country_code = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='COUNTRY_CODE']").text
+        except:
+            self.country_code = NULL
+        try:
+            self.launch_date = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='LAUNCH_DATE']").text
+        except:
+            self.launch_date = NULL
+        try:
+            self.site = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='SITE']").text
+        except:
+            self.site = NULL
+        try:
+            self.decay_date = self.segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='DECAY_DATE']").text
+        except:
+            self.decay_date = NULL
+
+        self.classification_type = self.segment.find(".//tleParameters/CLASSIFICATION_TYPE").text or NULL
+        self.norad_cat_id = self.segment.find(".//tleParameters/NORAD_CAT_ID").text or NULL
+        self.name = self.segment.find(".//metadata/OBJECT_NAME").text or NULL
 
