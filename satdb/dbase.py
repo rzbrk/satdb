@@ -1,4 +1,7 @@
 import mysql.connector
+from datetime import datetime
+
+NULL = "NULL"
 
 #------------------------------------------------------------------------------
 # Class for database connection instance and functions

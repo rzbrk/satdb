@@ -4,7 +4,7 @@ import yaml
 
 #------------------------------------------------------------------------------
 # Class for MySQL configuration
-class Config:
+class DBConfig:
     def __init__(self, configfilename):
         self.configfilename = configfilename
         self.host = None
