@@ -8,7 +8,7 @@ import xml.etree.ElementTree as et
 from datetime import datetime
 import os
 
-from satdb import Config, Dbase, NDMMetadata, NDMOrbelem, tools
+from satdb import DBConfig, Dbase, NDMMetadata, NDMOrbelem, tools
 
 NULL = "NULL"
 
@@ -66,7 +66,7 @@ def orbelem2db(db, od):
 def main(args):
 
     # Raed the config file
-    config = Config(args.config)
+    config = DBConfig(args.config)
 
     # Connect to the database
     dbc = Dbase(config)
