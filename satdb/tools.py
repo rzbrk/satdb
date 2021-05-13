@@ -26,7 +26,7 @@ def open_file(filename):
     if regexp.match('.*.gz$', filename):
         fh = gzip.open(filename, 'rt')
     else:
-        fh = open(filename, '')
+        fh = open(filename, 'r')
 
     return fh
 
