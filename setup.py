@@ -14,7 +14,7 @@ setup(name = 'satdb',
 #        description = '',
 #        long_description = open('README.md').read(),
         packages = ['satdb'],
-        scripts = ['omm2db.py'],
+        scripts = ['omm2db.py', 'st_dl_latest.py'],
         install_requires = [
             'mysql-connector-python',
             'pyyaml'
