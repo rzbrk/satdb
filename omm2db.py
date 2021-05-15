@@ -8,7 +8,7 @@ import xml.etree.ElementTree as et
 from datetime import datetime
 import os
 
-from satdb import DBConfig, Dbase, NDMMetadata, NDMOrbelem, tools
+from satdb import DBConfig, Dbase, OMMMetadata, OMMOrbelem, tools
 
 NULL = "NULL"
 
@@ -32,9 +32,9 @@ def metadata2db(db, md):
     # db_created is the creation/update time stamp from the object in the
     # database (python datetime object)
     db_created = res[1]
-    # ndm_created is the time from the NDM. Create a python datetime object
+    # omm_created is the time from the OMM. Create a python datetime object
     # from md.created (string)
-    ndm_created = datetime.strptime(md.created, '%Y-%m-%dT%H:%M:%S')
+    omm_created = datetime.strptime(md.created, '%Y-%m-%dT%H:%M:%S')
 
     # Because norad_cat_id is unique, n from the above database query can only
     # be zero (no such onject in database) or 1 (object already in database)
@@ -44,9 +44,9 @@ def metadata2db(db, md):
         db.write(sql, (md.obj_id, md.id_short, md.name, md.center_name, md.ref_frame, md.mean_element_theory, md.created, md.obj_type, md.rcs_size, md.country_code, md.launch_date, md.site, md.decay_date, md.classification_type, md.norad_cat_id))
     elif n == 1:
         # Object with given norad_cat_id already in database.
-        # Perform an update if data from NDM is newer that the data in the
+        # Perform an update if data from OMM is newer that the data in the
         # database. If not, do nothing.
-        if ndm_created > db_created:
+        if omm_created > db_created:
             sql = 'update object_metadata set id=%s, id_short=%s, name=%s, center_name=%s, ref_frame=%s, mean_element_theory=%s, created=%s, type=%s, rcs_size=%s, country_code=%s, launch_date=%s, site=%s, decay_date=%s, classification_type=%s where norad_cat_id=%s'
             db.write(sql, (md.obj_id, md.id_short, md.name, md.center_name, md.ref_frame, md.mean_element_theory, md.created, md.obj_type, md.rcs_size, md.country_code, md.launch_date, md.site, md.decay_date, md.classification_type, md.norad_cat_id))
     else:
@@ -72,21 +72,21 @@ def main(args):
     dbc = Dbase(config)
     dbc.connect()
 
-    # Open the NDM file
-    fh = tools.open_file(args.ndmfile)
+    # Open the OMM file
+    fh = tools.open_file(args.ommfile)
     root = et.fromstring(fh.read())
 
-    # Now, loop over all segments, which are the space objects in the NDM file
+    # Now, loop over all segments, which are the space objects in the OMM file
     n_segment = len(root.findall(".//segment"))
     i = 1
     t_start = datetime.now()
     for segment in root.findall(".//segment"):
 
         # Extract all data needed for the database table "object_metadata"
-        md = NDMMetadata(segment)
+        md = OMMMetadata(segment)
 
         # Extract all data needed for the database table "orbelem"
-        od = NDMOrbelem(segment, root)
+        od = OMMOrbelem(segment, root)
 
         eta = (datetime.now() - t_start)/i * (n_segment - i)
         print("[" + str(i) + "/" + str(n_segment) + "] Processing " + md.obj_id + " (" + md.name + "), ETA: " + str(eta))
@@ -101,6 +101,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("config", help="Config file")
-    parser.add_argument("ndmfile", help="NDM file")
+    parser.add_argument("ommfile", help="OMM file")
     args = parser.parse_args()
     main(args)

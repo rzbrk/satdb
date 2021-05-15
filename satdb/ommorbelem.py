@@ -3,7 +3,7 @@ from datetime import datetime
 NULL="NULL"
 
 # Class for orbital elements
-class NDMOrbelem:
+class OMMOrbelem:
     def __init__(self, segment, root):
         self.segment = segment
         self.root = root

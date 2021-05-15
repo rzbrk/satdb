@@ -3,7 +3,7 @@ from datetime import datetime
 NULL="NULL"
 
 # Class for object metadata
-class NDMMetadata:
+class OMMMetadata:
     def __init__(self, segment):
         self.segment = segment
         self.obj_id = NULL
