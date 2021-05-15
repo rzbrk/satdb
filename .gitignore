@@ -1,3 +1,6 @@
 satdb.yaml
 __pycache__/
 testdata/
+build/
+dist/
+satdb.egg-info/
