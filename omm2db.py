@@ -15,51 +15,125 @@ NULL = "NULL"
 #------------------------------------------------------------------------------
 # Ingest metadata in database
 def metadata2db(db, md):
-    # Handle NULL decay_date
-    if md.decay_date == NULL:
-        md.decay_date = "0000-00-00 00:00:00"
-    # Handle NULL launch_date
-    if md.launch_date == NULL:
-        md.launch_date = "0000-00-00 00:00:00"
 
-    # Each object is unambiguously defined by the norad_cat_id.
-    # The object metadata can change, especially for newly launched objects.
-    # First, see if object with norad_cat_id is already in the database. If
-    # so, perform an update. If not, perform insert.
-    sql = 'select count(*),created from object_metadata where norad_cat_id=%s'
-    res = db.fetchone(sql, (md.norad_cat_id,))
+    # Check, if the exact metadata set is already in database
+    sql = ('select count(*) from metadata ' +
+            'where norad=%s ' +
+            'and name=%s ' +
+            'and id=%s'  +
+            'and id_short=%s ' +
+            'and center_name=%s ' +
+            'and ref_frame=%s ' +
+            'and mean_element_theory=%s ' +
+            'and classification_type=%s ' +
+            'and type=%s ' +
+            'and rcs_size=%s ' +
+            'and country_code=%s ' +
+            'and launch_date=%s ' +
+            'and site=%s ' +
+            'and decay_date=%s')
+    res = db.fetchone(sql, (md.norad,
+        md.name,
+        md.obj_id,
+        md.id_short,
+        md.center_name,
+        md.ref_frame,
+        md.mean_element_theory,
+        md.classification_type,
+        md.obj_type,
+        md.rcs_size,
+        md.country_code,
+        md.launch_date,
+        md.site,
+        md.decay_date,)
+        )
     n = res[0]
-    # db_created is the creation/update time stamp from the object in the
-    # database (python datetime object)
-    db_created = res[1]
-    # omm_created is the time from the OMM. Create a python datetime object
-    # from md.created (string)
-    omm_created = datetime.strptime(md.created, '%Y-%m-%dT%H:%M:%S')
 
-    # Because norad_cat_id is unique, n from the above database query can only
-    # be zero (no such onject in database) or 1 (object already in database)
+    # Only if n = 0 the metadata not yet exist in db and will be inserted.
+    # If n > 0, simply do nothing, because data is already in database.
     if n == 0:
-        # No object with given norad_cat_id in database
-        sql = 'insert into object_metadata (id, id_short, name, center_name, ref_frame, mean_element_theory, created, type, rcs_size, country_code, launch_date, site, decay_date, classification_type, norad_cat_id) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        db.write(sql, (md.obj_id, md.id_short, md.name, md.center_name, md.ref_frame, md.mean_element_theory, md.created, md.obj_type, md.rcs_size, md.country_code, md.launch_date, md.site, md.decay_date, md.classification_type, md.norad_cat_id))
-    elif n == 1:
-        # Object with given norad_cat_id already in database.
-        # Perform an update if data from OMM is newer that the data in the
-        # database. If not, do nothing.
-        if omm_created > db_created:
-            sql = 'update object_metadata set id=%s, id_short=%s, name=%s, center_name=%s, ref_frame=%s, mean_element_theory=%s, created=%s, type=%s, rcs_size=%s, country_code=%s, launch_date=%s, site=%s, decay_date=%s, classification_type=%s where norad_cat_id=%s'
-            db.write(sql, (md.obj_id, md.id_short, md.name, md.center_name, md.ref_frame, md.mean_element_theory, md.created, md.obj_type, md.rcs_size, md.country_code, md.launch_date, md.site, md.decay_date, md.classification_type, md.norad_cat_id))
-    else:
-        # Multiple objects with the same norad_cat_id?!?
-        # Houston, we have a problem :/
-        print("Database must not contain multiple objects with same NORAD Cat ID. Exiting")
-        exit()
+        sql = ('insert into metadata (' +
+            'norad,' +
+            'name,' +
+            'id,' +
+            'id_short,' +
+            'center_name,' +
+            'ref_frame,' +
+            'mean_element_theory,' +
+            'classification_type,' +
+            'type,' +
+            'rcs_size,' +
+            'country_code,' +
+            'launch_date,' +
+            'site,' +
+            'decay_date,' +
+            'created) ' +
+            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+        res = db.write(sql, (md.norad,
+            md.name,
+            md.obj_id,
+            md.id_short,
+            md.center_name,
+            md.ref_frame,
+            md.mean_element_theory,
+            md.classification_type,
+            md.obj_type,
+            md.rcs_size,
+            md.country_code,
+            md.launch_date,
+            md.site,
+            md.decay_date,
+            md.created,)
+            )
 
 #------------------------------------------------------------------------------
 # Ingest orbital elements in database
 def orbelem2db(db, od):
-    sql = 'insert ignore into orbelem (epoch, mean_motion, eccentricity, inclination, ra_of_asc_node, arg_of_pericenter, mean_anomaly, ephemeris_type, norad_cat_id, element_set_no, rev_at_epoch, bstar, mean_motion_dot, mean_motion_ddot, semimajor_axis, period, apoapsis, periapsis, ingested, originator, data_created, originator_comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    db.write(sql, (od.epoch, od.mean_motion, od.eccentricity, od.inclination, od.raan, od.arg_of_pericenter, od.mean_anomaly, od.ephemeris_type, od.norad_cat_id, od.element_set_no, od.rev_at_epoch, od.bstar, od.mean_motion_dot, od.mean_motion_ddot, od.semimajor_axis, od.period, od.apoapsis, od.periapsis, od.ingested, od.originator, od.data_created, od.originator_comment))
+    sql = ('insert ignore into orbelem (epoch,' +
+            'mean_motion,' +
+            'eccentricity,' +
+            'inclination,' +
+            'ra_of_asc_node,' +
+            'arg_of_pericenter,' +
+            'mean_anomaly,' +
+            'ephemeris_type,' +
+            'norad_cat_id,' +
+            'element_set_no,' +
+            'rev_at_epoch,' +
+            'bstar,' +
+            'mean_motion_dot,' +
+            'mean_motion_ddot,' +
+            'semimajor_axis,' +
+            'period,' +
+            'apoapsis,' +
+            'periapsis,' +
+            'ingested,' +
+            'originator,' +
+            'data_created,' +
+            'originator_comment) values (%s, %s, %s, %s, %s, %s, %s, %s,' +
+            '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+    db.write(sql, (od.epoch,
+        od.mean_motion,
+        od.eccentricity,
+        od.inclination,
+        od.raan,
+        od.arg_of_pericenter,
+        od.mean_anomaly,
+        od.ephemeris_type,
+        od.norad_cat_id,
+        od.element_set_no,
+        od.rev_at_epoch,
+        od.bstar,
+        od.mean_motion_dot,
+        od.mean_motion_ddot,
+        od.semimajor_axis,
+        od.period,
+        od.apoapsis,
+        od.periapsis,
+        od.ingested,
+        od.originator,
+        od.data_created,
+        od.originator_comment))
 
 #------------------------------------------------------------------------------
 # Main routine
@@ -82,14 +156,16 @@ def main(args):
     t_start = datetime.now()
     for segment in root.findall(".//segment"):
 
-        # Extract all data needed for the database table "object_metadata"
-        md = OMMMetadata(segment)
+        # Extract all data needed for the database table "metadata"
+        md = OMMMetadata()
+        md.from_omm(segment)
 
         # Extract all data needed for the database table "orbelem"
         od = OMMOrbelem(segment, root)
 
         eta = (datetime.now() - t_start)/i * (n_segment - i)
-        print("[" + str(i) + "/" + str(n_segment) + "] Processing " + md.obj_id + " (" + md.name + "), ETA: " + str(eta))
+        print("[" + str(i) + "/" + str(n_segment) + "] Processing "
+                + md.obj_id + " (" + md.name + "), ETA: " + str(eta))
         metadata2db(dbc, md)
         orbelem2db(dbc, od)
         i += 1
