@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
-#import gzip
-#import re
 import xml.etree.ElementTree as et
-#import mysql.connector
 from datetime import datetime
 import os
 
 from satdb import DBConfig, Dbase, OMMMetadata, OMMOrbelem, tools
+from satdb.tools import ttprint
 
 NULL = "NULL"
 
@@ -111,14 +109,19 @@ def orbelem2db(db, od):
 # Main routine
 def main(args):
 
-    # Raed the config file
+    ttprint("Executing " + os.path.basename(__file__))
+
+    # Read the config file
+    ttprint("Reading config file " + args.config)
     config = DBConfig(args.config)
 
     # Connect to the database
+    ttprint("Connecting to database")
     dbc = Dbase(config)
     dbc.connect()
 
     # Open the OMM file
+    ttprint("Reading OMM file " + args.ommfile)
     fh = tools.open_file(args.ommfile)
     root = et.fromstring(fh.read())
 
@@ -136,15 +139,25 @@ def main(args):
         od = OMMOrbelem()
         od.from_omm(segment, root)
 
-        eta = (datetime.now() - t_start)/i * (n_segment - i)
-        print("[" + str(i) + "/" + str(n_segment) + "] Processing "
-                + md.obj_id + " (" + md.name + "), ETA: " + str(eta))
+        eta = (datetime.now() - t_start).seconds * (n_segment - i)/i
+        if eta > 60:
+            eta = round(eta/60., 1)
+            eta_units = " min"
+        else:
+            eta = int(eta)
+            eta_units = " sec"
+        ttprint("[" + str(i) + "/" + str(n_segment) + "] Processing "
+                + md.obj_id + " (" + md.name + "), ETA: " + str(eta)
+                + eta_units)
         metadata2db(dbc, md)
         orbelem2db(dbc, od)
         i += 1
 
     # Disconnect database
+    ttprint("Disconnecting from database")
     dbc.disconnect()
+
+    ttprint("Finished")
 
 ###############################################################################
 if __name__ == "__main__":

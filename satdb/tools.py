@@ -3,6 +3,7 @@
 import numpy as np
 import re as regexp
 import gzip
+from datetime import datetime
 
 # Earth radius in km
 re = 6378.
@@ -30,3 +31,7 @@ def open_file(filename):
 
     return fh
 
+# Time tagged print function
+def ttprint(message):
+    nowstr = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S:")
+    print(nowstr, message)
