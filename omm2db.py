@@ -69,7 +69,7 @@ def orbelem2db(db, od):
             'arg_of_pericenter,' +
             'mean_anomaly,' +
             'ephemeris_type,' +
-            'norad_cat_id,' +
+            'norad,' +
             'element_set_no,' +
             'rev_at_epoch,' +
             'bstar,' +
@@ -92,7 +92,7 @@ def orbelem2db(db, od):
         od.arg_of_pericenter,
         od.mean_anomaly,
         od.ephemeris_type,
-        od.norad_cat_id,
+        od.norad,
         od.element_set_no,
         od.rev_at_epoch,
         od.bstar,
@@ -133,7 +133,8 @@ def main(args):
         md.from_omm(segment)
 
         # Extract all data needed for the database table "orbelem"
-        od = OMMOrbelem(segment, root)
+        od = OMMOrbelem()
+        od.from_omm(segment, root)
 
         eta = (datetime.now() - t_start)/i * (n_segment - i)
         print("[" + str(i) + "/" + str(n_segment) + "] Processing "
