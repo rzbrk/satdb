@@ -16,23 +16,32 @@ NULL = "NULL"
 # Ingest metadata in database
 def metadata2db(db, md):
 
-    # Check, if the exact metadata set is already in database
-    sql = ('select count(*) from metadata ' +
-            'where norad=%s ' +
-            'and name=%s ' +
-            'and id=%s'  +
-            'and id_short=%s ' +
-            'and center_name=%s ' +
-            'and ref_frame=%s ' +
-            'and mean_element_theory=%s ' +
-            'and classification_type=%s ' +
-            'and type=%s ' +
-            'and rcs_size=%s ' +
-            'and country_code=%s ' +
-            'and launch_date=%s ' +
-            'and site=%s ' +
-            'and decay_date=%s')
-    res = db.fetchone(sql, (md.norad,
+    # All columns in table metadata - except created - form the primary key.
+    # Therefore, the combination of all column in the primary key will be
+    # unique. This will be ensured by the database itself. :)
+    # Therefore, we can perform an "insert ignore" for the metadata. If the
+    # database sees, the metadata already exists, the sql request will be
+    # ignored. This way, we save to perform a select request to see, if the
+    # metadata is already in the database. This improves the speed of the
+    # script.
+    sql = ('insert ignore into metadata (' +
+        'norad,' +
+        'name,' +
+        'id,' +
+        'id_short,' +
+        'center_name,' +
+        'ref_frame,' +
+        'mean_element_theory,' +
+        'classification_type,' +
+        'type,' +
+        'rcs_size,' +
+        'country_code,' +
+        'launch_date,' +
+        'site,' +
+        'decay_date,' +
+        'created) ' +
+        'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+    res = db.write(sql, (md.norad,
         md.name,
         md.obj_id,
         md.id_short,
@@ -45,46 +54,9 @@ def metadata2db(db, md):
         md.country_code,
         md.launch_date,
         md.site,
-        md.decay_date,)
+        md.decay_date,
+        md.created,)
         )
-    n = res[0]
-
-    # Only if n = 0 the metadata not yet exist in db and will be inserted.
-    # If n > 0, simply do nothing, because data is already in database.
-    if n == 0:
-        sql = ('insert into metadata (' +
-            'norad,' +
-            'name,' +
-            'id,' +
-            'id_short,' +
-            'center_name,' +
-            'ref_frame,' +
-            'mean_element_theory,' +
-            'classification_type,' +
-            'type,' +
-            'rcs_size,' +
-            'country_code,' +
-            'launch_date,' +
-            'site,' +
-            'decay_date,' +
-            'created) ' +
-            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
-        res = db.write(sql, (md.norad,
-            md.name,
-            md.obj_id,
-            md.id_short,
-            md.center_name,
-            md.ref_frame,
-            md.mean_element_theory,
-            md.classification_type,
-            md.obj_type,
-            md.rcs_size,
-            md.country_code,
-            md.launch_date,
-            md.site,
-            md.decay_date,
-            md.created,)
-            )
 
 #------------------------------------------------------------------------------
 # Ingest orbital elements in database
