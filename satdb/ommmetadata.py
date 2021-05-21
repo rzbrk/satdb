@@ -33,7 +33,7 @@ class OMMMetadata:
 
         self.obj_id = segment.find(".//metadata/OBJECT_ID").text
         if self.obj_id is not None:
-            if re.match('^[\d]{4}-[\d]{3}[A-Z]{1,3}$', self.obj_id):
+            if re.match('^[\d]{4}-[\d]{3}[A-Z]{0,3}$', self.obj_id):
                 self.id_short = self.obj_id[2:4] + self.obj_id[5:]
         self.name = segment.find(".//metadata/OBJECT_NAME").text
         self.center_name = segment.find(".//metadata/CENTER_NAME").text
