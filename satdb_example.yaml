@@ -4,3 +4,6 @@ satdb_read:
     database: "orbdata"
     user: "dbuser"
     password: "secret"
+spacetrack:
+    user: "email@example.com"
+    password: "secret"
