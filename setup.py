@@ -17,6 +17,8 @@ setup(name = 'satdb',
         scripts = ['omm2db.py', 'st_dl_latest.py'],
         install_requires = [
             'mysql-connector-python',
-            'pyyaml'
+            'pyyaml',
+            'spacetrack',
+            'numpy',
             ]
         )
