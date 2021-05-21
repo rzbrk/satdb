@@ -28,17 +28,17 @@ class OMMMetadata:
         self.created = None
 
     def from_omm(self, segment):
-        self.norad = segment.find(".//tleParameters/NORAD_CAT_ID").text or NULL
+        self.norad = segment.find(".//tleParameters/NORAD_CAT_ID").text
 
-        self.obj_id = segment.find(".//metadata/OBJECT_ID").text or NULL
-        if self.obj_id != NULL:
+        self.obj_id = segment.find(".//metadata/OBJECT_ID").text
+        if self.obj_id != "":
             self.id_short = self.obj_id[2:4] + self.obj_id[5:]
         self.name = segment.find(".//metadata/OBJECT_NAME").text
         self.center_name = segment.find(".//metadata/CENTER_NAME").text
         self.ref_frame = segment.find(".//metadata/REF_FRAME").text
         self.mean_element_theory = segment.find(".//metadata/MEAN_ELEMENT_THEORY").text
 
-        self.classification_type = segment.find(".//tleParameters/CLASSIFICATION_TYPE").text or NULL
+        self.classification_type = segment.find(".//tleParameters/CLASSIFICATION_TYPE").text
 
         # OMM user defined parameters
         try:
@@ -67,4 +67,15 @@ class OMMMetadata:
             self.decay_date = "0000-00-00T00:00:00"
 
         self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+
+        self.__empty2null()
+
+    # This internal function sets all object attributes which are empty
+    # strings ("") to the string "NULL"
+    def __empty2null(self):
+        for a in self.__dict__:
+            if not a.startswith('__'):
+                if getattr(self, a) == "":
+                    setattr(self, a, NULL)
+
 
