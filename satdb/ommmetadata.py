@@ -71,11 +71,12 @@ class OMMMetadata:
         self.__empty2null()
 
     # This internal function sets all object attributes which are empty
-    # strings ("") to the string "NULL"
+    # strings ("") or None to the string "NULL"
     def __empty2null(self):
         for a in self.__dict__:
             if not a.startswith('__'):
-                if getattr(self, a) == "":
+                val = getattr(self, a)
+                if val is None or val == "":
                     setattr(self, a, NULL)
 
 
