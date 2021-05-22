@@ -8,8 +8,6 @@ import os
 from satdb import DBConfig, Dbase, OMMMetadata, OMMOrbelem, tools
 from satdb.tools import ttprint
 
-NULL = "NULL"
-
 #------------------------------------------------------------------------------
 # Ingest metadata in database
 def metadata2db(db, md):

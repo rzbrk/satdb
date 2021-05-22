@@ -1,7 +1,7 @@
 from datetime import datetime
 import re
 
-NULL="NULL"
+#NULL="NULL"
 
 # Class for object metadata
 class OMMMetadata:
@@ -46,31 +46,37 @@ class OMMMetadata:
         try:
             self.obj_type = segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='OBJECT_TYPE']").text
         except:
-            self.obj_type = NULL
+            #self.obj_type = NULL
+            pass
         try:
             self.rcs_size = segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='RCS_SIZE']").text
         except:
-            self.rcs_size = NULL
+            #self.rcs_size = NULL
+            pass
         try:
             self.country_code = segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='COUNTRY_CODE']").text
         except:
-            self.country_code = NULL
+            #self.country_code = NULL
+            pass
         try:
             self.launch_date = segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='LAUNCH_DATE']").text
         except:
-            self.launch_date = "0000-00-00T00:00:00"
+            #self.launch_date = "0000-00-00T00:00:00"
+            pass
         try:
             self.site = segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='SITE']").text
         except:
-            self.site = NULL
+            #self.site = NULL
+            pass
         try:
             self.decay_date = segment.find(".//userDefinedParameters/USER_DEFINED[@parameter='DECAY_DATE']").text
         except:
-            self.decay_date = "0000-00-00T00:00:00"
+            #self.decay_date = "0000-00-00T00:00:00"
+            pass
 
         self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
 
-        self.__empty2null()
+        #self.__empty2null()
 
     # This internal function sets all object attributes which are empty
     # strings ("") or None to the string "NULL"
