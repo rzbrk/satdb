@@ -8,10 +8,14 @@ class OMMMetadata:
     def __init__(self):
         self.norad = None
 
+        # We "borrow the epoch from the mean orbital elements also for the
+        # metadata
+        self.epoch = None
+
         # OMM standard metadata (celestrak & spacetrack)
-        self.name = None
         self.obj_id = None
         self.id_short = None # derived from obj_id)
+        self.name = None
         self.center_name = None
         self.ref_frame = None
         self.mean_element_theory = None
@@ -26,10 +30,21 @@ class OMMMetadata:
         self.decay_date = None
 
         # Creation date/time of entry in database
-        self.created = None
+        self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+
+    def set(self, **kwargs):
+        # Loop over the kwargs dictionary
+        for key, value in kwargs.items():
+            # If object/instance has attribute, change it to the given value
+            if hasattr(self, key):
+                setattr(self, key, value)
+        # Always update/overwrite the attribute created
+        self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
 
     def from_omm(self, segment):
         self.norad = segment.find(".//tleParameters/NORAD_CAT_ID").text
+
+        self.epoch = segment.find(".//meanElements/EPOCH").text or None
 
         self.obj_id = segment.find(".//metadata/OBJECT_ID").text
         if self.obj_id is not None:
@@ -78,13 +93,28 @@ class OMMMetadata:
 
         #self.__empty2null()
 
-    # This internal function sets all object attributes which are empty
-    # strings ("") or None to the string "NULL"
-    def __empty2null(self):
-        for a in self.__dict__:
-            if not a.startswith('__'):
-                val = getattr(self, a)
-                if val is None or val == "":
-                    setattr(self, a, NULL)
+    def to_db(self, dbc):
+        # Initialize lists for the db columns to write to and for the
+        # corresponding values
+        db_cols=[]
+        db_vals=[]
 
+        # Loop over all attributes and put the attributes which are not None
+        # to the above lists
+        for attr in self.__dict__:
+            val = getattr(self, attr)
+            if val is not None:
+                db_cols.append(attr)
+                db_vals.append(val)
+
+        # Create the sql statement to insert the data to the db
+        ps = ["%s"] * len(db_cols)
+        sql = "insert ignore into metadata ("
+        sql += ", ".join(db_cols)
+        sql += ") values ("
+        sql += ", ".join(ps)
+        sql += ")"
+
+        # Execute the sql statement
+        res = dbc.write(sql, tuple(db_vals))
 
