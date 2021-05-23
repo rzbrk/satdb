@@ -16,7 +16,7 @@ FLUSH PRIVILEGES;
 ```
 
 Create the necessary tables in the database. Therefore, use the file
-`./setup/init.sql` in the repository:
+[`./setup/init.sql`](https://raw.githubusercontent.com/rzbrk/satdb/master/setup/init.sql) in the repository:
 
 ```
 mysql -u dbuser -D orbdata -p < ./setup/init.sql
@@ -26,7 +26,8 @@ Edit the `satdb` config file `satdb.yaml`. Insert the credentials for the
 database. If you want to download OMM/XML files from `space-track.org`, you have
 to insert the appropriate credentials, too.
 
-To install the python modules and scripts execute './setup.py':
+To install the python modules and scripts execute
+[`./setup.py`](https://raw.githubusercontent.com/rzbrk/satdb/master/setup.py):
 
 ```
 python3 ./setup.py install
