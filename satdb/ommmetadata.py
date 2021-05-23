@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
+from tletools import TLE
 
 #NULL="NULL"
 
@@ -91,7 +92,29 @@ class OMMMetadata:
 
         self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
 
-        #self.__empty2null()
+    def from_tle(self, tle_lines=None):
+
+        if tle_lines is not None:
+            if len(tle_lines) == 3:
+                tle = TLE.from_lines(*tle_lines)
+
+                self.norad = tle.norad
+                self.epoch = (
+                        datetime(tle.epoch_year, 1, 1)
+                        + timedelta(days=(tle.epoch_day - 1))
+                        )
+
+                self.obj_id = (
+                        str(tle.epoch_year)
+                        + "-"
+                        + tle.int_desig[2:]
+                        )
+                self.id_short = tle.int_desig
+                self.name = tle.name
+
+                self.classification_type = tle.classification
+
+                self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
 
     def to_db(self, dbc):
         # Initialize lists for the db columns to write to and for the

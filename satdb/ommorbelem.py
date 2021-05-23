@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from tletools import TLE
 
 #NULL="NULL"
 
@@ -109,6 +110,62 @@ class OMMOrbelem:
             pass
         self.data_created = root.find(".//CREATION_DATE").text or None
         self.originator = root.find(".//ORIGINATOR").text or None
+
+        self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+
+    def from_tle(self, tle_lines=None):
+
+        if tle_lines is not None:
+            if len(tle_lines) == 3:
+                tle = TLE.from_lines(*tle_lines)
+
+                self.norad = tle.norad
+                self.epoch = datetime(tle.epoch_year, 1, 1) + timedelta(days=(tle.epoch_day - 1))
+
+        # Format of TLE dict for reference
+        #(
+        #name='ISS (ZARYA)',
+        #norad='25544',
+        #classification='U',
+        #int_desig='98067A',
+        #epoch_year=2019,
+        #epoch_day=249.04864348,
+        #dn_o2=1.909e-05,
+        #ddn_o6=0.0,
+        #bstar=4.0858e-05,
+        #set_num=999,
+        #inc=51.6464,
+        #raan=320.1755,
+        #ecc=0.0007999,
+        #argp=10.9066,
+        #M=53.2893,
+        #n=15.50437522,
+        #rev_num=18780
+        #)
+
+        # Orbital mean elements
+        self.mean_motion = tle.n
+        self.eccentricity = tle.ecc
+        self.inclination = tle.inc
+        self.raan = tle.raan
+        self.arg_of_pericenter = tle.argp
+        self.mean_anomaly = tle.M
+
+        # TLE parameters
+        self.ephemeris_type = 0
+        self.classification_type = tle.classification
+        self.element_set_no = tle.set_num
+        self.rev_at_epoch = tle.rev_num
+        self.bstar = tle.bstar
+        self.mean_motion_dot = tle.dn_o2
+        self.mean_motion_ddot = tle.ddn_o6
+
+        # User defined parameters (space-track only)
+        # Can be computed from orbital mean elements
+        self.semimajor_axis = GM13 / ((TPI86 * float(self.mean_motion)) ** (2.0 / 3.0)) / 1000.0
+        self.period = 2.0 * PI * (((float(self.semimajor_axis) * 1000.0) ** 3.0) / GM) ** (0.5) / 60.0
+        self.apoapsis = float(self.semimajor_axis) * (1.0 + float(self.eccentricity)) - MRAD
+        self.periapsis = float(self.semimajor_axis) * (1.0 - float(self.eccentricity)) - MRAD
 
         self.created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
 

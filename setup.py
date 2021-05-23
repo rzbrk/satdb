@@ -14,11 +14,12 @@ setup(name = 'satdb',
 #        description = '',
 #        long_description = open('README.md').read(),
         packages = ['satdb'],
-        scripts = ['omm2db.py', 'st_dl_latest.py'],
+        scripts = ['omm2db.py', 'st_dl_latest.py', 'tle2db.py'],
         install_requires = [
             'mysql-connector-python',
             'pyyaml',
             'spacetrack',
             'numpy',
+            'TLE-tools',
             ]
         )
