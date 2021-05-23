@@ -96,8 +96,12 @@ class OMMMetadata:
     def to_db(self, dbc):
         # Initialize lists for the db columns to write to and for the
         # corresponding values
-        db_cols=[]
-        db_vals=[]
+        db_cols = []
+        db_vals = []
+
+        # All colums but epoch or created
+        db_cols_red = []
+        db_vals_red = []
 
         # Loop over all attributes and put the attributes which are not None
         # to the above lists
@@ -106,15 +110,37 @@ class OMMMetadata:
             if val is not None:
                 db_cols.append(attr)
                 db_vals.append(val)
+            if attr != "epoch" and attr != "created" and val is not None:
+                db_cols_red.append(attr)
+                db_vals_red.append(val)
 
-        # Create the sql statement to insert the data to the db
-        ps = ["%s"] * len(db_cols)
-        sql = "insert ignore into metadata ("
-        sql += ", ".join(db_cols)
-        sql += ") values ("
-        sql += ", ".join(ps)
-        sql += ")"
+        # We will insert the metadata ONLY to the database, if this will add
+        # new data. Therefore, we first perform a select-count query on the
+        # database for all columns but epoch and created with the values
+        # given. If the count returns something greater zero, the data is
+        # already in the database and we do not need to insert.
 
-        # Execute the sql statement
-        res = dbc.write(sql, tuple(db_vals))
+        # Create the sql statement for the select-count query
+        #ps = ["%s"] * len(db_cols_red)
+        sql_sel = "select count(*) from metadata where "
+        wheres = []
+        for i in range(0, len(db_cols_red)):
+            wheres.append(db_cols_red[i] + " = \"" + db_vals_red[i] + "\"")
+        wheres = " and ".join(wheres)
+        sql_sel += wheres
+
+        # Execute the sql insert statement
+        n = dbc.fetchone(sql_sel)[0]
+
+        if n == 0:
+            # Create the sql statement to insert the data to the db
+            ps = ["%s"] * len(db_cols)
+            sql_ins = "insert ignore into metadata ("
+            sql_ins += ", ".join(db_cols)
+            sql_ins += ") values ("
+            sql_ins += ", ".join(ps)
+            sql_ins += ")"
+
+            # Execute the sql insert statement
+            res = dbc.write(sql_ins, tuple(db_vals))
 
