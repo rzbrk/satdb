@@ -3,7 +3,7 @@
 import numpy as np
 import re as regexp
 import gzip
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import floor, log10
 import re
 
@@ -103,4 +103,21 @@ def tle_checksum(line=None):
             checksum = None
 
     return checksum
+
+# Calculate a datetime object from the year YYYY and the decimal day of
+# year (doy)
+def doy2datetime(year, doy):
+    # The day of year starts with 1 at January, 1st 00:00:00! See e.g.
+    # the example in the German Wikipedia article for TLE:
+    # https://de.wikipedia.org/wiki/Satellitenbahnelement#Erl%C3%A4uterung_der_Zahlengruppen
+    # Therefore, the doy must be greater-equal 1
+    return datetime(year, 1, 1) + timedelta(days=(doy - 1))
+
+# Calculate the decimal day of year from a given datetime object
+def datetime2doy(epoch):
+    # January, 1st 00:00:00 is already doy 1! Therefore, the below line
+    # contains a constant 1
+    t0 = datetime(epoch.year, 1, 1)
+
+    return 1. + (epoch - t0).days + (epoch - t0).seconds / 86400.
 

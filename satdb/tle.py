@@ -39,9 +39,10 @@ class TLE:
         line0 = res[0]
 
         # Calculate the decimal day of year
-        epoch = res[4]
-        boy = datetime(epoch.year, 1, 1, 0, 0, 0) # begin of year (YYYY-01-01T00:00:00)
-        doy = (epoch - boy).days + (epoch - boy).seconds / 86400.
+        doy = tools.datetime2doy(res[4])
+#        epoch = res[4]
+#        boy = datetime(epoch.year, 1, 1, 0, 0, 0) # begin of year (YYYY-01-01T00:00:00)
+#        doy = (epoch - boy).days + (epoch - boy).seconds / 86400.
 
         line1 = ''.join([
             '1',                                            # line number

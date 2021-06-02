@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from tletools import TLE
+from satdb import tools
 
 #NULL="NULL"
 
@@ -120,7 +121,8 @@ class OMMOrbelem:
                 tle = TLE.from_lines(*tle_lines)
 
                 self.norad = tle.norad
-                self.epoch = datetime(tle.epoch_year, 1, 1) + timedelta(days=(tle.epoch_day - 1))
+                self.epoch = tools.doy2datetime(tle.epoch_year, tle.epoch_day)
+                #self.epoch = datetime(tle.epoch_year, 1, 1) + timedelta(days=(tle.epoch_day - 1))
 
         # Format of TLE dict for reference
         #(
