@@ -53,3 +53,29 @@ An example configuration file for `satdb` is provided in the repository:
 Edit the `satdb` config file `satdb.yaml`. Insert the credentials for the
 database. If you want to download OMM/XML files from `space-track.org`, you have
 to insert the appropriate credentials, too.
+
+### Download TLEs from Celestrak and import into database
+
+Latest TLEs for the last 30 days launches can be downloaded
+['here'](https://celestrak.com/NORAD/elements/tle-new.txt) from Celestrak. The data is updates every couple of hours. You can create a cron job and download the files to the above mentioned data directory `~/satdb-downloads/unprocessed`. Now you can run a bash script to import the TLE files in the directory with `tle2db.py` into the database:
+
+```
+for file in $(ls ~/satdb-downloads/unprocessed/*.tle)
+do
+    tle2db.py ~/.config/satdb.yaml ${file}
+    mv ${file} ~/satdb-downloads/processed/.
+    done
+```
+
+### Download OMM/XML from Space-Track and import into database
+
+Latest OMMs for all active space objects can be downloaded with `st_dl_latest.py`. You can create a cron job and download the files to the above mentioned data directory `~/satdb-downloads/unprocessed`. Now, you can run a bash script to import the OMM files in the directory with `omm2db.py` into the database:
+
+```
+for file in $(ls ~/satdb-downloads/unprocessed/*.xml.gz)
+do
+    omm2db.py ~/.config/satdb.yaml ${file}
+    mv ${file} ~/satdb-downloads/processed/.
+    done
+```
+
