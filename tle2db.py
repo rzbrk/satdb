@@ -22,6 +22,7 @@ def main(args):
     dbc.connect()
 
     # Open the TLE file
+    ttprint("Reading TLE file " + args.tlefile)
     fh = tools.open_file(args.tlefile)
     all_lines = fh.readlines()
     fh.close
