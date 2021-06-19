@@ -25,24 +25,27 @@ Create the necessary empty tables in the database. Therefore, use the file
 mysql -u dbuser -D orbdata -p < ./setup/init.sql
 ```
 
-### Directory structure
+### Directory structure for data downloads
 
 I recommend to establish a directory structure for the OMM and TLE files like
 the following:
 
-* `~/satdb-downloads/unprocessed/` here you can put all OMM and TLE downloads
+* `./data/unprocessed/` here you can put all OMM and TLE downloads
   which have still to be imported to the database.
-* `~/satdb-downloads/processed/` here you can move all files which are already
+* `./data/processed/` here you can move all files which are already
   imported to the database. You can access these files at a later time, whenever
   necessary.
 
-### Installation of Python modules and scripts
+### Installation of Python scripts and dependencies
 
-To install the python modules and scripts execute
+`satdb` uses [`pipenv`](https://pipenv.pypa.io/) to create and manage a virtualenv environment and keeps track of all the dependencies. Therefore, it is recommended to install pipenv before. In addition, `satdb` uses ['python 3.8'](https://www.python.org/).
+
+To install the python scripts in a pipenv virtual environment, execute
 [`./setup.py`](https://raw.githubusercontent.com/rzbrk/satdb/master/setup.py):
 
 ```
-python3 ./setup.py install
+cd ./scripts/
+pipenv install
 ```
 
 ### Adapt the config file
@@ -62,10 +65,11 @@ Latest TLEs for the last 30 days launches can be downloaded
 into the database:
 
 ```
-for file in $(ls ~/satdb-downloads/unprocessed/*.tle)
+cd ./scripts/
+for file in $(ls ./../data/unprocessed/*.tle)
 do
-    tle2db.py ~/.config/satdb.yaml ${file}
-    mv ${file} ~/satdb-downloads/processed/.
+    pipenv run tle2db.py ~/.config/satdb.yaml ${file}
+    mv ${file} ./../data/processed/.
 done
 ```
 
@@ -78,10 +82,11 @@ You can create a cron job and download the files to the above mentioned data dir
 into the database:
 
 ```
-for file in $(ls ~/satdb-downloads/unprocessed/*.xml.gz)
+cd ./scripts/
+for file in $(ls ./../data/unprocessed/*.xml.gz)
 do
-    omm2db.py ~/.config/satdb.yaml ${file}
-    mv ${file} ~/satdb-downloads/processed/.
+    pipenv run omm2db.py ~/.config/satdb.yaml ${file}
+    mv ${file} ./../data/satdb-downloads/processed/.
 done
 ```
 
