@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from setuptools import setup, find_package
+from setuptools import setup, find_packages
 
 setup(name = 'satdb',
         version = '0.1',
