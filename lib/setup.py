@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 
-# install module/scripts with:
-# python setup.py install
-
-#from distutils.core import setup
-from setuptools import setup
+from setuptools import setup, find_package
 
 setup(name = 'satdb',
         version = '0.1',
@@ -13,8 +9,8 @@ setup(name = 'satdb',
 #        license = '',
 #        description = '',
 #        long_description = open('README.md').read(),
-        packages = ['satdb'],
-        scripts = ['omm2db.py', 'st_dl_latest.py', 'tle2db.py'],
+        packages = find_packages(),
+#        scripts = ['omm2db.py', 'st_dl_latest.py', 'tle2db.py'],
         install_requires = [
             'mysql-connector-python',
             'pyyaml',

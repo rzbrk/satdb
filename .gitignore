@@ -5,3 +5,4 @@ testdata/
 build/
 dist/
 satdb.egg-info/
+lib/pyproject.toml
