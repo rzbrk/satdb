@@ -12,6 +12,7 @@ verify_ssl = true
 #tle-tools = "*"
 #numpy = "*"
 satdb = {editable = true, path = "./../lib"}
+aiohttp = "*"
 
 [requires]
 python_version = "3.8"
