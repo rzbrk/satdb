@@ -88,7 +88,9 @@ $ pipenv run [script]
 
 #### Jupyter notebooks
 
-The installation of the pipenv virtual environment for the Jupyter notebooks is similar to the installation of the Python scripts (see above). Just change to the directory `./notebook/` before executing `pipenv install` or `pipenv sync`. You can then launch Jupyter by:
+Some notebooks are using [Cartopy](https://scitools.org.uk/cartopy/docs/latest/index.html), especially those plotting sub satellite trajectory. Cartopy requires dependencies which cannot be installed from PyPI. Usually, you have to install the [PROJ](https://proj.org/index.html) development files as well as the [GEOS](https://trac.osgeo.org/geos/) development files. On Linux systems, you can install the packages using the distro's package manager. For more information on installing Cartopy see [here](https://scitools.org.uk/cartopy/docs/latest/installing.html#installing) or [here](https://pyviz-tutorial.readthedocs.io/de/latest/matplotlib/cartopy/install.html).
+
+Except from the Cartopy dependencies the installation of the pipenv virtual environment for the Jupyter notebooks is similar to the installation of the Python scripts (see above). Just change to the directory `./notebook/` before executing `pipenv install` or `pipenv sync`. Afterwards, you can then launch Jupyter by:
 
 ```
 $ pipenv run jupyter notebook
