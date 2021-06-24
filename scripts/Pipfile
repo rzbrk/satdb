@@ -11,8 +11,8 @@ verify_ssl = true
 #spacetrack = "*"
 #tle-tools = "*"
 #numpy = "*"
-satdb = {editable = true, path = "./../lib"}
 aiohttp = "*"
+satdb = {editable = true, path = "./../lib"}
 
 [requires]
 python_version = "3.8"
