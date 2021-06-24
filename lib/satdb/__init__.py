@@ -1,3 +1,4 @@
+from .baseconfig import *
 from .dbconfig import *
 from .stconfig import *
 from .dbase import *
